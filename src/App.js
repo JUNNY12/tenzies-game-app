@@ -28,24 +28,20 @@ const App = () => {
     return <li key={id}>{k.playerScore} </li>
   })
 
+// Function to clear Scores
+const clearScores = async (id) => scores.orderBy(id).delete()
+
+
 // Game States
   const [diceEl, setDice] = useState(AllNewDice())
   const [tenzies, setTenzies] = useState(false)
   const [countRoll, setCountRoll]= useState(0)
   const [display, setDisplay] = useState(false)
-  const [date, setDate] = useState(new Date())
 
 // Funtion to show Score
   const showScore = () => {
       setDisplay(prevData => !prevData)
   }
-
-  const showDate = () => {
-    setDate()
-  }
-  
-
-
 
 // Checking if all dice holds thesame Value
   useEffect(() =>{
@@ -56,7 +52,6 @@ const App = () => {
     if(allHeldDice && sameValue){
       setTenzies(true)
       addScore()
-      showDate()
     }
   }, [diceEl])
 
@@ -157,6 +152,12 @@ const App = () => {
           <p>{!playerScores?.length && "You don't Have any score yet"}</p>
           <div>{scoreItem}</div>
         </div>
+        <button 
+        className='clear'
+        onClick={() => clearScores()}
+        >
+          Clear Scores
+        </button>
       </div>
        </div>
     </div>
