@@ -4,16 +4,50 @@ import Die from './Die'
 import { useState, useEffect } from 'react'
 import { nanoid } from 'nanoid'
 import Confetti from 'react-confetti'
+import Dexie from 'dexie'
+import { useLiveQuery } from 'dexie-react-hooks'
 
+
+export const db = new Dexie("scoreDatabase");
+db.version(2).stores({
+    scores:"++id, playerScore"
+});
+
+const {scores} = db
 
 const App = () => {
 
-  
+  // Adding Score to db
+  const addScore = async () => {
+    await scores.add({
+      playerScore:countRoll,
+    })
+  }
+  const playerScores = useLiveQuery(() => scores.toArray())
+  const scoreItem = playerScores?.map((k, id) => {
+    return <li key={id}>{k.playerScore} </li>
+  })
 
+// Game States
   const [diceEl, setDice] = useState(AllNewDice())
   const [tenzies, setTenzies] = useState(false)
+  const [countRoll, setCountRoll]= useState(0)
+  const [display, setDisplay] = useState(false)
+  const [date, setDate] = useState(new Date())
+
+// Funtion to show Score
+  const showScore = () => {
+      setDisplay(prevData => !prevData)
+  }
+
+  const showDate = () => {
+    setDate()
+  }
+  
 
 
+
+// Checking if all dice holds thesame Value
   useEffect(() =>{
     const allHeldDice = diceEl.every(die => die.isHeld)
     const firstValue = diceEl[0].value
@@ -21,6 +55,8 @@ const App = () => {
 
     if(allHeldDice && sameValue){
       setTenzies(true)
+      addScore()
+      showDate()
     }
   }, [diceEl])
 
@@ -66,6 +102,9 @@ const App = () => {
       die:
       generateNewDie()
     }))
+    
+    setCountRoll(prevCount => prevCount + 1 )
+    
    }
    else{
      setTenzies(false)
@@ -87,9 +126,11 @@ const App = () => {
 
   return (
     <div className='App'>
+      
+      {tenzies && <h1 className='won'>You Won the game with {countRoll} Roll of the Dice !!!</h1>}
+
         <main className='Main'>
           {tenzies && <Confetti />}
-          {tenzies && <p className='won'>You Won!!!</p>}
           <h1 className='header'>Tenzies</h1>
 
           <p className='para'>Roll until all dice are thesame. Click each die to freeze it at its current position.</p>
@@ -104,6 +145,17 @@ const App = () => {
                >{tenzies? "Start New Game" :"Roll Dice"}</button>
             </div>
         </main>
+
+       <div>
+       <div>
+            <button className="view" onClick={showScore}>View Score</button>
+        </div> 
+
+      <div className={display? "scores" : "hide scores"}>
+        <h3>Your Score</h3>
+        <div>{scoreItem}</div>
+      </div>
+       </div>
     </div>
   )
 }
