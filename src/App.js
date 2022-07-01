@@ -152,12 +152,13 @@ const clearScores = async (id) => scores.orderBy(id).delete()
           <p>{!playerScores?.length && "You don't Have any score yet"}</p>
           <div>{scoreItem}</div>
         </div>
+       {playerScores?.length && 
         <button 
         className='clear'
         onClick={() => clearScores()}
         >
           Clear Scores
-        </button>
+        </button>}
       </div>
        </div>
     </div>
