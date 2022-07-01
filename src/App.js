@@ -153,7 +153,10 @@ const App = () => {
 
       <div className={display? "scores" : "hide scores"}>
         <h3>Your Score</h3>
-        <div>{scoreItem}</div>
+        <div>
+          <p>{!playerScores?.length && "You don't Have any score yet"}</p>
+          <div>{scoreItem}</div>
+        </div>
       </div>
        </div>
     </div>
